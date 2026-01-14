@@ -1,3 +1,4 @@
+
 # =========================================================
 # 1. IMPORT LIBRARIES
 # =========================================================
@@ -14,7 +15,7 @@ from sklearn.metrics import confusion_matrix, accuracy_score, roc_curve, roc_auc
 # =========================================================
 st.set_page_config(
     page_title="LightGBM Classifier Dashboard",
-    page_icon="🌿",
+    page_icon="⚡",
     layout="wide"
 )
 
@@ -31,7 +32,7 @@ body {
     text-align: center;
     font-size: 40px;
     font-weight: bold;
-    color: #4ade80;
+    color: #38bdf8;
 }
 .subtitle {
     text-align: center;
@@ -42,7 +43,7 @@ body {
     background-color: #020617;
     padding: 20px;
     border-radius: 15px;
-    box-shadow: 0px 0px 15px rgba(74,222,128,0.3);
+    box-shadow: 0px 0px 15px rgba(56,189,248,0.3);
 }
 .metric-box {
     background-color: #020617;
@@ -56,7 +57,7 @@ body {
 # =========================================================
 # 4. TITLE
 # =========================================================
-st.markdown('<div class="title">🌿 LightGBM Classifier Dashboard</div>', unsafe_allow_html=True)
+st.markdown('<div class="title">⚡ LightGBM Classifier Dashboard</div>', unsafe_allow_html=True)
 st.markdown('<div class="subtitle">Social Network Ads Dataset</div>', unsafe_allow_html=True)
 st.markdown("<br>", unsafe_allow_html=True)
 
@@ -70,9 +71,10 @@ with open("scaler.pkl", "rb") as f:
     scaler = pickle.load(f)
 
 # =========================================================
-# 6. LOAD DATA (NO UPLOAD)
+# 6. LOAD DATA
 # =========================================================
 dataset = pd.read_csv(r"C:\Users\Admin\Desktop\lgbm\Social_Network_Ads.csv")
+
 X = dataset.iloc[:, [2, 3]].values
 y = dataset.iloc[:, -1].values
 
@@ -112,20 +114,27 @@ y_pred = model.predict(X_scaled)
 
 accuracy = accuracy_score(y, y_pred)
 cm = confusion_matrix(y, y_pred)
+bias = model.score(X_scaled, y)
+variance = accuracy
 
-col1, col2, col3 = st.columns(3)
+col1, col2, col3, col4 = st.columns(4)
 
 with col1:
     st.markdown('<div class="metric-box">', unsafe_allow_html=True)
-    st.metric("Accuracy", f"{accuracy:.2f}")
+    st.metric("Accuracy", f"{accuracy:.4f}")
     st.markdown('</div>', unsafe_allow_html=True)
 
 with col2:
     st.markdown('<div class="metric-box">', unsafe_allow_html=True)
-    st.metric("Bias (Train Score)", f"{model.score(X_scaled, y):.2f}")
+    st.metric("Bias (Train Score)", f"{bias:.4f}")
     st.markdown('</div>', unsafe_allow_html=True)
 
 with col3:
+    st.markdown('<div class="metric-box">', unsafe_allow_html=True)
+    st.metric("Variance (Test Score)", f"{variance:.4f}")
+    st.markdown('</div>', unsafe_allow_html=True)
+
+with col4:
     st.markdown('<div class="metric-box">', unsafe_allow_html=True)
     st.metric("Estimators", model.n_estimators)
     st.markdown('</div>', unsafe_allow_html=True)
@@ -137,9 +146,9 @@ st.markdown("### 📊 Confusion Matrix")
 
 fig, ax = plt.subplots()
 ax.imshow(cm)
+ax.set_title("Confusion Matrix")
 ax.set_xlabel("Predicted")
 ax.set_ylabel("Actual")
-ax.set_title("Confusion Matrix")
 
 for i in range(cm.shape[0]):
     for j in range(cm.shape[1]):
@@ -157,7 +166,7 @@ fpr, tpr, _ = roc_curve(y, y_prob)
 auc_score = roc_auc_score(y, y_prob)
 
 fig, ax = plt.subplots()
-ax.plot(fpr, tpr, label=f"AUC = {auc_score:.2f}")
+ax.plot(fpr, tpr, label=f"AUC = {auc_score:.4f}")
 ax.plot([0, 1], [0, 1])
 ax.set_xlabel("False Positive Rate")
 ax.set_ylabel("True Positive Rate")
